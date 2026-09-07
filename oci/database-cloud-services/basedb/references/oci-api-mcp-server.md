@@ -284,7 +284,7 @@ For BaseDB inventory:
 Recommended DB-system inventory:
 
 ```json
-{"tool":"run_oci_command","arguments":{"command":"db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all --query \"data[*].{Name:\\\"display-name\\\",ID:id,State:\\\"lifecycle-state\\\",Shape:shape,AD:\\\"availability-domain\\\",Version:version}\" --output table"}}
+{"tool":"run_oci_command","arguments":{"command":"db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all"}}
 ```
 
 For a known DB-system OCID, skip compartment discovery and get it directly.
@@ -298,7 +298,7 @@ Read-only list/get operations do not require a mutation confirmation.
 Resolve compartment and region first; accept one region or `all regions`.
 
 ```json
-{"tool":"run_oci_command","arguments":{"command":"db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all --query \"data[*].{ID:id,Name:\\\"display-name\\\",State:\\\"lifecycle-state\\\",Shape:shape,AD:\\\"availability-domain\\\",Nodes:\\\"node-count\\\",Version:version}\" --output table"}}
+{"tool":"run_oci_command","arguments":{"command":"db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all"}}
 ```
 
 For `all regions`, list subscribed regions first and label each result.
@@ -308,7 +308,7 @@ For `all regions`, list subscribed regions first and label each result.
 Resolve the VM DB system first:
 
 ```json
-{"tool":"run_oci_command","arguments":{"command":"db db-home list --compartment-id <COMPARTMENT_OCID> --db-system-id <DB_SYSTEM_OCID> --region <REGION> --all --query \"data[*].{ID:id,Name:\\\"display-name\\\",State:\\\"lifecycle-state\\\",Version:\\\"db-version\\\"}\" --output table"}}
+{"tool":"run_oci_command","arguments":{"command":"db db-home list --compartment-id <COMPARTMENT_OCID> --db-system-id <DB_SYSTEM_OCID> --region <REGION> --all"}}
 ```
 
 Do not use scoping flags from another database service.
@@ -318,7 +318,7 @@ Do not use scoping flags from another database service.
 Resolve a DB system, then a DB home. List with the DB-home scope:
 
 ```json
-{"tool":"run_oci_command","arguments":{"command":"db database list --compartment-id <COMPARTMENT_OCID> --db-home-id <DB_HOME_OCID> --region <REGION> --all --query \"data[*].{ID:id,Name:\\\"db-name\\\",DisplayName:\\\"display-name\\\",State:\\\"lifecycle-state\\\",DbHomeId:\\\"db-home-id\\\"}\" --output table"}}
+{"tool":"run_oci_command","arguments":{"command":"db database list --compartment-id <COMPARTMENT_OCID> --db-home-id <DB_HOME_OCID> --region <REGION> --all"}}
 ```
 
 Preserve DB-system and DB-home context in the returned inventory.
@@ -328,7 +328,7 @@ Preserve DB-system and DB-home context in the returned inventory.
 Resolve the parent database/CDB, then:
 
 ```json
-{"tool":"run_oci_command","arguments":{"command":"db pluggable-database list --database-id <DATABASE_OCID> --region <REGION> --all --query \"data[*].{ID:id,Name:\\\"pdb-name\\\",OpenMode:\\\"open-mode\\\",State:\\\"lifecycle-state\\\"}\" --output table"}}
+{"tool":"run_oci_command","arguments":{"command":"db pluggable-database list --database-id <DATABASE_OCID> --region <REGION> --all"}}
 ```
 
 ### List Backups And Data Guard Associations
