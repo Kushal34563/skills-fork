@@ -19,7 +19,7 @@
 - [Read-only Boundary](#read-only-boundary)
 - [Error Handling](#error-handling)
 - [Common Pitfalls](#common-pitfalls)
-- [Correct And Incorrect Tool Calls](#correct-and-incorrect-tool-calls)
+- [Correct And Incorrect Command Examples](#correct-and-incorrect-command-examples)
 - [Sources](#sources)
 
 ## Purpose
@@ -85,12 +85,22 @@ For a denied mutation, do not collect mutation inputs, call `get_oci_command_hel
 
 Profile and auth are server-level settings, not tool-call options. Never add `--profile` or `--auth` to a command string, and do not run `oci session authenticate` through this path.
 
+Pass commands exactly as the OCI CLI command text following `oci`. Examples:
+
+```json
+{"tool":"run_oci_command","arguments":{"command":"db exadb-vm-cluster list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all"}}
+```
+
+```json
+{"tool":"run_oci_command","arguments":{"command":"db exadb-vm-cluster get --exadb-vm-cluster-id <VM_CLUSTER_OCID> --region <REGION>"}}
+```
+
 ## Compartment Operations
 
 Compartment discovery is tenancy-global. This skill can list or resolve existing compartments, but does not create compartments. Get tenancy context with `iam region-subscription list`, then list descendants with:
 
-```text
-iam compartment list --compartment-id <TENANCY_OCID> --compartment-id-in-subtree true --all
+```json
+{"tool":"run_oci_command","arguments":{"command":"iam compartment list --compartment-id <TENANCY_OCID> --compartment-id-in-subtree true --all"}}
 ```
 
 For a compartment name, match `output.data[].name`: use the one matching OCID; if multiple match, show the OCIDs and ask the user; if none match, confirm tenancy root or offer the full list.
@@ -169,7 +179,7 @@ Never run `db database list` or `db db-home list` with only `--compartment-id`; 
 Resolve compartment and region first; accept one region or `all regions`.
 
 ```json
-{"command":"db exadb-vm-cluster list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all --query \"data[*].{ID:id,Name:\\\"display-name\\\",State:\\\"lifecycle-state\\\",AD:\\\"availability-domain\\\",Nodes:\\\"node-count\\\",EnabledECPU:\\\"enabled-e-cpu-count\\\",TotalECPU:\\\"total-e-cpu-count\\\"}\" --output table"}
+{"tool":"run_oci_command","arguments":{"command":"db exadb-vm-cluster list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all"}}
 ```
 
 For `all regions`, list subscribed regions first, then run the list once per region.
@@ -179,7 +189,7 @@ For `all regions`, list subscribed regions first, then run the list once per reg
 Resolve a VM cluster by OCID, name, or compartment-and-region list. List databases only with `--vm-cluster-id`, then group by `db-home-id` or filter client-side for one DB home:
 
 ```json
-{"command":"db database list --compartment-id <COMPARTMENT_OCID> --vm-cluster-id <VM_CLUSTER_OCID> --region <REGION> --all --query \"data[*].{ID:id,Name:\\\"db-name\\\",DisplayName:\\\"display-name\\\",State:\\\"lifecycle-state\\\",DbHomeId:\\\"db-home-id\\\"}\" --output table"}
+{"tool":"run_oci_command","arguments":{"command":"db database list --compartment-id <COMPARTMENT_OCID> --vm-cluster-id <VM_CLUSTER_OCID> --region <REGION> --all"}}
 ```
 
 For one DB home only, filter `data[?\"db-home-id\"=='<DB_HOME_OCID>']`. Never return a flat compartment-wide database list without VM-cluster and DB-home context.
@@ -189,7 +199,7 @@ For one DB home only, filter `data[?\"db-home-id\"=='<DB_HOME_OCID>']`. Never re
 Resolve the parent database/CDB, then list only with `--database-id`:
 
 ```json
-{"command":"db pluggable-database list --database-id <DATABASE_OCID> --region <REGION> --query \"data[*].{ID:id,Name:\\\"pdb-name\\\",OpenMode:\\\"open-mode\\\",State:\\\"lifecycle-state\\\"}\" --output table"}
+{"tool":"run_oci_command","arguments":{"command":"db pluggable-database list --database-id <DATABASE_OCID> --region <REGION>"}}
 ```
 
 ## Error Handling
@@ -209,7 +219,7 @@ Resolve the parent database/CDB, then list only with `--database-id`:
 - Polling by default.
 - Passing `oci`, `--profile`, `--auth`, or `--help` in MCP tool input.
 
-## Correct And Incorrect Read-only Tool Calls
+## Correct And Incorrect Command Examples
 
 Correct:
 

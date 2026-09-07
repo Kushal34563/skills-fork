@@ -34,9 +34,11 @@ For read-only workflows, resolve existing parents from the top down. Do not coll
 ## Routing Workflow
 
 1. Identify the resource family and action.
-2. Read `references/oci-api-mcp-server.md`.
-3. Collect the required parameters.
-4. Execute the read-only operation through the OCI API MCP server.
+2. Apply the MCP-only and mutation-denial rules.
+3. Read `references/oci-api-mcp-server.md`.
+4. Collect the required parameters and read scope.
+5. Read `references/validation.md`.
+6. Execute the read-only operation through the OCI API MCP server.
 
 ### Step 1: Identify the action
 
@@ -71,7 +73,11 @@ Apply these collection rules:
 - Use RSA SSH keys; do not request or recommend Ed25519 keys.
 - Never echo admin passwords, SSH private keys, API private keys, wallet secrets, or session tokens back to the user.
 
-### Step 5: Execute read-only operations
+### Step 5: Read the validation reference
+
+Read [references/validation.md](references/validation.md) after collecting read scope and before execution.
+
+### Step 6: Execute read-only operations
 
 - Execute only after the read-only scope is resolved.
 - Do not request mutation confirmation because mutation operations are denied.
@@ -82,6 +88,10 @@ Apply these collection rules:
 ### `references/oci-api-mcp-server.md`
 
 Read for direct MCP operations, compartment resolution, ExaDB-XS inventory, command help, and error handling. It is the source of truth for read-only MCP execution.
+
+### `references/validation.md`
+
+[Validation](references/validation.md) — scope and identity validation for permitted ExaDB-XS reads.
 
 ## Required Behaviors
 
@@ -95,4 +105,4 @@ State that this skill supports only direct OCI API MCP operations. Do not genera
 
 ### When the user says "run the OCI CLI command using MCP server"
 
-Read [references/oci-api-mcp-server.md](references/oci-api-mcp-server.md), collect runtime scope, and execute only through MCP.
+If the command is read-only, read [references/oci-api-mcp-server.md](references/oci-api-mcp-server.md), collect runtime scope, read [references/validation.md](references/validation.md), and execute only through MCP. Otherwise deny it before any MCP call.
