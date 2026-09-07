@@ -18,7 +18,7 @@
 - [List And Read Operations Usually Need Scope](#list-and-read-operations-usually-need-scope)
 - [Error Handling](#error-handling)
 - [Common Pitfalls](#common-pitfalls)
-- [Correct And Incorrect Tool Calls](#correct-and-incorrect-tool-calls)
+- [Correct And Incorrect Command Examples](#correct-and-incorrect-command-examples)
 - [Sources](#sources)
 
 ## Purpose
@@ -283,8 +283,8 @@ For BaseDB inventory:
 
 Recommended DB-system inventory:
 
-```json
-{"command":"db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all --query \"data[*].{Name:\\\"display-name\\\",ID:id,State:\\\"lifecycle-state\\\",Shape:shape,AD:\\\"availability-domain\\\",Version:version}\" --output table"}
+```text
+db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all --query "data[*].{Name:\"display-name\",ID:id,State:\"lifecycle-state\",Shape:shape,AD:\"availability-domain\",Version:version}" --output table
 ```
 
 For a known DB-system OCID, skip compartment discovery and get it directly.
@@ -297,8 +297,8 @@ Read-only list/get operations do not require a mutation confirmation.
 
 Resolve compartment and region first; accept one region or `all regions`.
 
-```json
-{"command":"db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all --query \"data[*].{ID:id,Name:\\\"display-name\\\",State:\\\"lifecycle-state\\\",Shape:shape,AD:\\\"availability-domain\\\",Nodes:\\\"node-count\\\",Version:version}\" --output table"}
+```text
+db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all --query "data[*].{ID:id,Name:\"display-name\",State:\"lifecycle-state\",Shape:shape,AD:\"availability-domain\",Nodes:\"node-count\",Version:version}" --output table
 ```
 
 For `all regions`, list subscribed regions first and label each result.
@@ -307,8 +307,8 @@ For `all regions`, list subscribed regions first and label each result.
 
 Resolve the VM DB system first:
 
-```json
-{"command":"db db-home list --compartment-id <COMPARTMENT_OCID> --db-system-id <DB_SYSTEM_OCID> --region <REGION> --all --query \"data[*].{ID:id,Name:\\\"display-name\\\",State:\\\"lifecycle-state\\\",Version:\\\"db-version\\\"}\" --output table"}
+```text
+db db-home list --compartment-id <COMPARTMENT_OCID> --db-system-id <DB_SYSTEM_OCID> --region <REGION> --all --query "data[*].{ID:id,Name:\"display-name\",State:\"lifecycle-state\",Version:\"db-version\"}" --output table
 ```
 
 Do not use scoping flags from another database service.
@@ -317,8 +317,8 @@ Do not use scoping flags from another database service.
 
 Resolve a DB system, then a DB home. List with the DB-home scope:
 
-```json
-{"command":"db database list --compartment-id <COMPARTMENT_OCID> --db-home-id <DB_HOME_OCID> --region <REGION> --all --query \"data[*].{ID:id,Name:\\\"db-name\\\",DisplayName:\\\"display-name\\\",State:\\\"lifecycle-state\\\",DbHomeId:\\\"db-home-id\\\"}\" --output table"}
+```text
+db database list --compartment-id <COMPARTMENT_OCID> --db-home-id <DB_HOME_OCID> --region <REGION> --all --query "data[*].{ID:id,Name:\"db-name\",DisplayName:\"display-name\",State:\"lifecycle-state\",DbHomeId:\"db-home-id\"}" --output table
 ```
 
 Preserve DB-system and DB-home context in the returned inventory.
@@ -327,8 +327,8 @@ Preserve DB-system and DB-home context in the returned inventory.
 
 Resolve the parent database/CDB, then:
 
-```json
-{"command":"db pluggable-database list --database-id <DATABASE_OCID> --region <REGION> --all --query \"data[*].{ID:id,Name:\\\"pdb-name\\\",OpenMode:\\\"open-mode\\\",State:\\\"lifecycle-state\\\"}\" --output table"}
+```text
+db pluggable-database list --database-id <DATABASE_OCID> --region <REGION> --all --query "data[*].{ID:id,Name:\"pdb-name\",OpenMode:\"open-mode\",State:\"lifecycle-state\"}" --output table
 ```
 
 ### List Backups And Data Guard Associations
@@ -361,42 +361,42 @@ Resolve the parent database, then use the `db backup list` or `db data-guard-ass
 - Echoing passwords or secret material.
 - Falling back to local OCI CLI after an MCP denial.
 
-## Correct And Incorrect Tool Calls
+## Correct And Incorrect Command Examples
 
 Correct:
 
-```json
-{"tool":"get_oci_command_help","arguments":{"command":"db system list"}}
+```text
+db system list
 ```
 
-```json
-{"tool":"run_oci_command","arguments":{"command":"db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all"}}
+```text
+db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all
 ```
 
-```json
-{"tool":"run_oci_command","arguments":{"command":"db db-home list --compartment-id <COMPARTMENT_OCID> --db-system-id <DB_SYSTEM_OCID> --region <REGION> --all"}}
+```text
+db db-home list --compartment-id <COMPARTMENT_OCID> --db-system-id <DB_SYSTEM_OCID> --region <REGION> --all
 ```
 
-```json
-{"tool":"run_oci_command","arguments":{"command":"db database list --compartment-id <COMPARTMENT_OCID> --db-home-id <DB_HOME_OCID> --region <REGION> --all"}}
+```text
+db database list --compartment-id <COMPARTMENT_OCID> --db-home-id <DB_HOME_OCID> --region <REGION> --all
 ```
 
 Incorrect:
 
-```json
-{"tool":"run_oci_command","arguments":{"command":"oci db system list --profile DEFAULT --compartment-id <COMPARTMENT_OCID>"}}
+```text
+db system list --profile DEFAULT --compartment-id <COMPARTMENT_OCID>
 ```
 
-This incorrectly includes the executable and per-call profile.
+This incorrectly includes a per-call profile; the executable is supplied by the MCP server.
 
-```json
-{"tool":"get_oci_command_help","arguments":{"command":"db system list --help"}}
+```text
+db system list --help
 ```
 
 The help tool receives the command group without `--help`.
 
-```json
-{"tool":"run_oci_command","arguments":{"command":"db database list --compartment-id <COMPARTMENT_OCID> --region <REGION>"}}
+```text
+db database list --compartment-id <COMPARTMENT_OCID> --region <REGION>
 ```
 
 This omits the DB-home scope anchor.

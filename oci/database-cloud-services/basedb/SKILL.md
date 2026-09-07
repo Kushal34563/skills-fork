@@ -41,8 +41,9 @@ Never skip a required parent decision. Resolve parents from the top down for rea
 
 1. Identify the resource family and action.
 2. Read the MCP reference.
-3. Collect required parameters.
-4. Execute the read-only MCP command.
+3. Collect required parameters and read scope.
+4. Read the validation reference.
+5. Execute the permitted read-only MCP command.
 
 ### Step 1: Identify the action
 
@@ -68,14 +69,22 @@ Apply these collection rules:
   - or want the available resources listed first
 - Never echo admin passwords, SSH private keys, API private keys, wallet secrets, TDE passwords, or session tokens back to the user.
 
+### Step 4: Read the validation reference
+
+Read [references/validation.md](references/validation.md) after collecting read scope and before execution.
+
 ## Reference Map
 
 ### `references/oci-api-mcp-server.md`
 
 Read for direct read-only MCP operations, compartment and network discovery, BaseDB inventory, DB homes, databases/CDBs, PDBs, backups, Data Guard, command help, and error handling.
 
+### `references/validation.md`
+
+[Validation](references/validation.md) — scope and identity validation for permitted BaseDB reads.
+
 ## Required Behaviors
 
 ### When the user says "run the OCI CLI command using MCP server"
 
-If the command is read-only, read [references/oci-api-mcp-server.md](references/oci-api-mcp-server.md), collect runtime scope, and execute only through MCP. Otherwise deny it before any MCP call.
+If the command is read-only, read [references/oci-api-mcp-server.md](references/oci-api-mcp-server.md), collect runtime scope, read [references/validation.md](references/validation.md), and execute only through MCP. Otherwise deny it before any MCP call.
