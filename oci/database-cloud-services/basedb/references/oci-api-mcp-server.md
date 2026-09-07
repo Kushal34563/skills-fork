@@ -88,12 +88,12 @@ Profile and authentication are server-level settings, not tool-call options. Nev
 
 Pass commands exactly as the OCI CLI command text following `oci`. Examples:
 
-```text
-db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all
+```json
+{"tool":"run_oci_command","arguments":{"command":"db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all"}}
 ```
 
-```text
-db system get --db-system-id <DB_SYSTEM_OCID> --region <REGION>
+```json
+{"tool":"run_oci_command","arguments":{"command":"db system get --db-system-id <DB_SYSTEM_OCID> --region <REGION>"}}
 ```
 
 Do not assume that local OCI CLI extensions, aliases, preprod endpoints, or profile settings are available through the MCP server. If the server cannot reach the intended tenancy or service endpoint, report that boundary instead of adding local flags.
@@ -104,8 +104,8 @@ Compartment discovery is tenancy-global. This skill can list and resolve existin
 
 Get tenancy context through the server's active session and list descendants with:
 
-```text
-iam compartment list --compartment-id <TENANCY_OCID> --compartment-id-in-subtree true --all
+```json
+{"tool":"run_oci_command","arguments":{"command":"iam compartment list --compartment-id <TENANCY_OCID> --compartment-id-in-subtree true --all"}}
 ```
 
 Resolution rules:
@@ -196,14 +196,14 @@ Common user-friendly mappings may be offered, but never selected silently:
 
 List:
 
-```text
-db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all
+```json
+{"tool":"run_oci_command","arguments":{"command":"db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all"}}
 ```
 
 Get:
 
-```text
-db system get --db-system-id <DB_SYSTEM_OCID> --region <REGION>
+```json
+{"tool":"run_oci_command","arguments":{"command":"db system get --db-system-id <DB_SYSTEM_OCID> --region <REGION>"}}
 ```
 
 For a display name, list within the compartment and region and match the complete `display-name`. If multiple resources match, show their OCIDs and lifecycle states.
@@ -212,14 +212,14 @@ For a display name, list within the compartment and region and match the complet
 
 List existing VCNs:
 
-```text
-network vcn list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all
+```json
+{"tool":"run_oci_command","arguments":{"command":"network vcn list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all"}}
 ```
 
 List existing subnets in a selected VCN:
 
-```text
-network subnet list --compartment-id <COMPARTMENT_OCID> --vcn-id <VCN_OCID> --region <REGION> --all
+```json
+{"tool":"run_oci_command","arguments":{"command":"network subnet list --compartment-id <COMPARTMENT_OCID> --vcn-id <VCN_OCID> --region <REGION> --all"}}
 ```
 
 Validate that the selected subnet and optional NSGs belong to the selected VCN. Discovery only: do not create networking.
@@ -228,8 +228,8 @@ Validate that the selected subnet and optional NSGs belong to the selected VCN. 
 
 List DB homes only after resolving a DB system:
 
-```text
-db db-home list --compartment-id <COMPARTMENT_OCID> --db-system-id <DB_SYSTEM_OCID> --region <REGION> --all
+```json
+{"tool":"run_oci_command","arguments":{"command":"db db-home list --compartment-id <COMPARTMENT_OCID> --db-system-id <DB_SYSTEM_OCID> --region <REGION> --all"}}
 ```
 
 Use `db db-home get --db-home-id <DB_HOME_OCID>` for exact state when supported by live help.
@@ -238,8 +238,8 @@ Use `db db-home get --db-home-id <DB_HOME_OCID>` for exact state when supported 
 
 List databases only after resolving a DB home:
 
-```text
-db database list --compartment-id <COMPARTMENT_OCID> --db-home-id <DB_HOME_OCID> --region <REGION> --all
+```json
+{"tool":"run_oci_command","arguments":{"command":"db database list --compartment-id <COMPARTMENT_OCID> --db-home-id <DB_HOME_OCID> --region <REGION> --all"}}
 ```
 
 Get a database by its OCID when supported by live help.
@@ -248,8 +248,8 @@ Get a database by its OCID when supported by live help.
 
 List PDBs only under a resolved database:
 
-```text
-db pluggable-database list --database-id <DATABASE_OCID> --region <REGION> --all
+```json
+{"tool":"run_oci_command","arguments":{"command":"db pluggable-database list --database-id <DATABASE_OCID> --region <REGION> --all"}}
 ```
 
 
@@ -257,8 +257,8 @@ db pluggable-database list --database-id <DATABASE_OCID> --region <REGION> --all
 
 List backups under a resolved database:
 
-```text
-db backup list --database-id <DATABASE_OCID> --region <REGION> --all
+```json
+{"tool":"run_oci_command","arguments":{"command":"db backup list --database-id <DATABASE_OCID> --region <REGION> --all"}}
 ```
 
 
@@ -266,8 +266,8 @@ db backup list --database-id <DATABASE_OCID> --region <REGION> --all
 
 List associations under a resolved database:
 
-```text
-db data-guard-association list --database-id <DATABASE_OCID> --region <REGION> --all
+```json
+{"tool":"run_oci_command","arguments":{"command":"db data-guard-association list --database-id <DATABASE_OCID> --region <REGION> --all"}}
 ```
 
 
@@ -283,8 +283,8 @@ For BaseDB inventory:
 
 Recommended DB-system inventory:
 
-```text
-db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all --query "data[*].{Name:\"display-name\",ID:id,State:\"lifecycle-state\",Shape:shape,AD:\"availability-domain\",Version:version}" --output table
+```json
+{"tool":"run_oci_command","arguments":{"command":"db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all --query \"data[*].{Name:\\\"display-name\\\",ID:id,State:\\\"lifecycle-state\\\",Shape:shape,AD:\\\"availability-domain\\\",Version:version}\" --output table"}}
 ```
 
 For a known DB-system OCID, skip compartment discovery and get it directly.
@@ -297,8 +297,8 @@ Read-only list/get operations do not require a mutation confirmation.
 
 Resolve compartment and region first; accept one region or `all regions`.
 
-```text
-db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all --query "data[*].{ID:id,Name:\"display-name\",State:\"lifecycle-state\",Shape:shape,AD:\"availability-domain\",Nodes:\"node-count\",Version:version}" --output table
+```json
+{"tool":"run_oci_command","arguments":{"command":"db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all --query \"data[*].{ID:id,Name:\\\"display-name\\\",State:\\\"lifecycle-state\\\",Shape:shape,AD:\\\"availability-domain\\\",Nodes:\\\"node-count\\\",Version:version}\" --output table"}}
 ```
 
 For `all regions`, list subscribed regions first and label each result.
@@ -307,8 +307,8 @@ For `all regions`, list subscribed regions first and label each result.
 
 Resolve the VM DB system first:
 
-```text
-db db-home list --compartment-id <COMPARTMENT_OCID> --db-system-id <DB_SYSTEM_OCID> --region <REGION> --all --query "data[*].{ID:id,Name:\"display-name\",State:\"lifecycle-state\",Version:\"db-version\"}" --output table
+```json
+{"tool":"run_oci_command","arguments":{"command":"db db-home list --compartment-id <COMPARTMENT_OCID> --db-system-id <DB_SYSTEM_OCID> --region <REGION> --all --query \"data[*].{ID:id,Name:\\\"display-name\\\",State:\\\"lifecycle-state\\\",Version:\\\"db-version\\\"}\" --output table"}}
 ```
 
 Do not use scoping flags from another database service.
@@ -317,8 +317,8 @@ Do not use scoping flags from another database service.
 
 Resolve a DB system, then a DB home. List with the DB-home scope:
 
-```text
-db database list --compartment-id <COMPARTMENT_OCID> --db-home-id <DB_HOME_OCID> --region <REGION> --all --query "data[*].{ID:id,Name:\"db-name\",DisplayName:\"display-name\",State:\"lifecycle-state\",DbHomeId:\"db-home-id\"}" --output table
+```json
+{"tool":"run_oci_command","arguments":{"command":"db database list --compartment-id <COMPARTMENT_OCID> --db-home-id <DB_HOME_OCID> --region <REGION> --all --query \"data[*].{ID:id,Name:\\\"db-name\\\",DisplayName:\\\"display-name\\\",State:\\\"lifecycle-state\\\",DbHomeId:\\\"db-home-id\\\"}\" --output table"}}
 ```
 
 Preserve DB-system and DB-home context in the returned inventory.
@@ -327,8 +327,8 @@ Preserve DB-system and DB-home context in the returned inventory.
 
 Resolve the parent database/CDB, then:
 
-```text
-db pluggable-database list --database-id <DATABASE_OCID> --region <REGION> --all --query "data[*].{ID:id,Name:\"pdb-name\",OpenMode:\"open-mode\",State:\"lifecycle-state\"}" --output table
+```json
+{"tool":"run_oci_command","arguments":{"command":"db pluggable-database list --database-id <DATABASE_OCID> --region <REGION> --all --query \"data[*].{ID:id,Name:\\\"pdb-name\\\",OpenMode:\\\"open-mode\\\",State:\\\"lifecycle-state\\\"}\" --output table"}}
 ```
 
 ### List Backups And Data Guard Associations
@@ -365,38 +365,38 @@ Resolve the parent database, then use the `db backup list` or `db data-guard-ass
 
 Correct:
 
-```text
-db system list
+```json
+{"tool":"run_oci_command","arguments":{"command":"db system list"}}
 ```
 
-```text
-db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all
+```json
+{"tool":"run_oci_command","arguments":{"command":"db system list --compartment-id <COMPARTMENT_OCID> --region <REGION> --all"}}
 ```
 
-```text
-db db-home list --compartment-id <COMPARTMENT_OCID> --db-system-id <DB_SYSTEM_OCID> --region <REGION> --all
+```json
+{"tool":"run_oci_command","arguments":{"command":"db db-home list --compartment-id <COMPARTMENT_OCID> --db-system-id <DB_SYSTEM_OCID> --region <REGION> --all"}}
 ```
 
-```text
-db database list --compartment-id <COMPARTMENT_OCID> --db-home-id <DB_HOME_OCID> --region <REGION> --all
+```json
+{"tool":"run_oci_command","arguments":{"command":"db database list --compartment-id <COMPARTMENT_OCID> --db-home-id <DB_HOME_OCID> --region <REGION> --all"}}
 ```
 
 Incorrect:
 
-```text
-db system list --profile DEFAULT --compartment-id <COMPARTMENT_OCID>
+```json
+{"tool":"run_oci_command","arguments":{"command":"db system list --profile DEFAULT --compartment-id <COMPARTMENT_OCID>"}}
 ```
 
 This incorrectly includes a per-call profile; the executable is supplied by the MCP server.
 
-```text
-db system list --help
+```json
+{"tool":"get_oci_command_help","arguments":{"command":"db system list"}}
 ```
 
 The help tool receives the command group without `--help`.
 
-```text
-db database list --compartment-id <COMPARTMENT_OCID> --region <REGION>
+```json
+{"tool":"run_oci_command","arguments":{"command":"db database list --compartment-id <COMPARTMENT_OCID> --region <REGION>"}}
 ```
 
 This omits the DB-home scope anchor.
